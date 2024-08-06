@@ -9,29 +9,46 @@ spec:
       recordType: A
       targets:
         - 172.32.200.1
+    - dnsName: 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
+      recordTTL: 60
+      recordType: A
+      targets:
+        - 172.32.200.2
     - dnsName: ${KUADRANT_SUB_DOMAIN}
       recordTTL: 300
       recordType: CNAME
       targets:
         - klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: eu.klb.${KUADRANT_SUB_DOMAIN}
-      providerSpecific:
-        - name: weight
-          value: "120"
       recordTTL: 60
       recordType: CNAME
       setIdentifier: 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
       targets:
         - 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
+    - dnsName: us.klb.${KUADRANT_SUB_DOMAIN}
+      recordTTL: 60
+      recordType: CNAME
+      setIdentifier: 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
+      targets:
+        - 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
         - name: geo-code
-          value: EU
+          value: GEO-EU
       recordTTL: 300
       recordType: CNAME
       setIdentifier: EU
       targets:
         - eu.klb.${KUADRANT_SUB_DOMAIN}
+    - dnsName: klb.${KUADRANT_SUB_DOMAIN}
+      providerSpecific:
+        - name: geo-code
+          value: GEO-NA
+      recordTTL: 300
+      recordType: CNAME
+      setIdentifier: US
+      targets:
+        - us.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
         - name: geo-code
@@ -42,7 +59,7 @@ spec:
       targets:
         - eu.klb.${KUADRANT_SUB_DOMAIN}
   healthCheck:
-    endpoint: /
+    endpoint: /health
     failureThreshold: 3
     port: 80
     protocol: HTTPS
