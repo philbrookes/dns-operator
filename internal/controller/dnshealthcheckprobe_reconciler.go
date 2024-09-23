@@ -29,7 +29,11 @@ func (r *DNSProbeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	ctx = log.IntoContext(ctx, baseLogger)
 	logger := baseLogger
 
+<<<<<<< HEAD
 	logger.Info("TODO Reconciling DNSHealthCheckProbe")
+=======
+	logger.Info("Reconciling DNSHealthCheckProbe")
+>>>>>>> 7a0c19d (add DNSHealthProbe CRD)
 
 	previous := &v1alpha1.DNSHealthCheckProbe{}
 	err := r.Client.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: req.Name}, previous)
