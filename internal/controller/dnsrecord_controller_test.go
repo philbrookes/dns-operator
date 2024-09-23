@@ -154,7 +154,11 @@ var _ = Describe("DNSRecordReconciler", func() {
 					HealthCheck: &v1alpha1.HealthCheckSpec{
 						Path:             "health",
 						Port:             ptr.To(5),
+<<<<<<< HEAD
 						Protocol:         v1alpha1.Protocol("cat"),
+=======
+						Protocol:         ptr.To(v1alpha1.Protocol("cat")),
+>>>>>>> 1ac6aaf (add DNSHealthProbe CRD)
 						FailureThreshold: ptr.To(-1),
 					},
 				},
