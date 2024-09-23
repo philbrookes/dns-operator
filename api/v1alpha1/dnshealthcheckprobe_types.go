@@ -28,12 +28,21 @@ type DNSHealthCheckProbeSpec struct {
 	// Port to connect to the host on. Must be either 80, 443 or 1024-49151
 	// +kubebuilder:validation:XValidation:rule="self in [80, 443] || (self >= 1024 && self <= 49151)",message="Only ports 80, 443, 1024-49151 are allowed"
 	Port *int `json:"port,omitempty"`
+<<<<<<< HEAD
 	// Hostname is the value sent in the host header, to route the request to the correct service
 	// +kubebuilder:validation:Pattern=`^[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+$`
 	Hostname string `json:"hostname,omitempty"`
 	// IP Address to connect to the host on.
 	// +kubebuilder:validation:Pattern=`^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$`
 	IPAddress string `json:"ipAddress,omitempty"`
+=======
+	// Host is the value sent in the host header, to route the request to the correct service
+	// +kubebuilder:validation:Pattern=`^[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+$`
+	Host string `json:"host,omitempty"`
+	// IP Address to connect to the host on.
+	// +kubebuilder:validation:Pattern=`^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$`
+	IPAddress string `json:"address,omitempty"`
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
 	// Path is the path to append to the host to reach the expected health check.
 	// Must start with "?" or "/", contain only valid URL characters and end with alphanumeric char or "/". For example "/" or "/healthz" are common
 	// +kubebuilder:validation:Pattern=`^(?:\?|\/)[\w\-.~:\/?#\[\]@!$&'()*+,;=]+(?:[a-zA-Z0-9]|\/){1}$`
@@ -104,7 +113,11 @@ func (p *DNSHealthCheckProbe) Default() {
 }
 
 func (p *DNSHealthCheckProbe) ToString() string {
+<<<<<<< HEAD
 	return fmt.Sprintf("%v://%v:%v/%v", p.Spec.Protocol, p.Spec.Hostname, p.Spec.Port, p.Spec.Path)
+=======
+	return fmt.Sprintf("%v://%v:%v/%v", p.Spec.Protocol, p.Spec.Host, p.Spec.Port, p.Spec.Path)
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
 }
 
 func init() {

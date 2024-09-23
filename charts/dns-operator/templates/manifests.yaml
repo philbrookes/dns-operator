@@ -71,6 +71,13 @@ spec:
                 required:
                 - name
                 type: object
+<<<<<<< HEAD
+=======
+              address:
+                description: IP Address to connect to the host on.
+                pattern: ^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$
+                type: string
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
               allowInsecureCertificate:
                 description: |-
                   AllowInsecureCertificate will instruct the health check probe to not fail on a self-signed or otherwise invalid SSL certificate
@@ -83,19 +90,28 @@ spec:
                 x-kubernetes-validations:
                 - message: Failure threshold must be greater than 0
                   rule: self > 0
+<<<<<<< HEAD
               hostname:
                 description: Hostname is the value sent in the host header, to route
                   the request to the correct service
+=======
+              host:
+                description: Host is the value sent in the host header, to route the
+                  request to the correct service
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
                 pattern: ^[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+$
                 type: string
               interval:
                 description: Interval defines how frequently this probe should execute
                 format: int64
                 type: integer
+<<<<<<< HEAD
               ipAddress:
                 description: IP Address to connect to the host on.
                 pattern: ^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$
                 type: string
+=======
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
               path:
                 description: |-
                   Path is the path to append to the host to reach the expected health check.

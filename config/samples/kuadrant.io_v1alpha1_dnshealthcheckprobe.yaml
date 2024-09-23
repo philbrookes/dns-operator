@@ -4,8 +4,13 @@ metadata:
   name: dnsprobe-sample
 spec:
   port: 443
+<<<<<<< HEAD
   hostname: "test.com"
   ipAddress: "192.168.0.16"
+=======
+  host: "test.com"
+  address: "192.168.0.16"
+>>>>>>> 4270fc0 (add DNSHealthProbe CRD)
   path: "/"
   protocol: "HTTPS"
   interval: "60s"
