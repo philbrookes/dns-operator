@@ -45,6 +45,7 @@ import (
 	externaldnsplan "github.com/kuadrant/dns-operator/internal/external-dns/plan"
 	externaldnsregistry "github.com/kuadrant/dns-operator/internal/external-dns/registry"
 	"github.com/kuadrant/dns-operator/internal/metrics"
+	"github.com/kuadrant/dns-operator/internal/probes"
 	"github.com/kuadrant/dns-operator/internal/provider"
 )
 
@@ -498,6 +499,12 @@ func (r *DNSRecordReconciler) applyChanges(ctx context.Context, dnsRecord *v1alp
 		return false, fmt.Errorf("adjusting specEndpoints: %w", err)
 	}
 
+	//healthySpecEndpoints = Records that this DNSRecord expects to exist, that do not have matching unhealthy probes
+	healthySpecEndpoints, err := probes.RemoveUnhealthyEndpoints(ctx, r.Client, specEndpoints, dnsRecord)
+	if err != nil {
+		return false, fmt.Errorf("removing unhealthy specEndpoints: %w", err)
+	}
+
 	//statusEndpoints = Records that were created/updated by this DNSRecord last
 	statusEndpoints, err := registry.AdjustEndpoints(dnsRecord.Status.Endpoints)
 	if err != nil {
@@ -506,9 +513,9 @@ func (r *DNSRecordReconciler) applyChanges(ctx context.Context, dnsRecord *v1alp
 
 	//Note: All endpoint lists should be in the same provider specific format at this point
 	logger.V(1).Info("applyChanges", "zoneEndpoints", zoneEndpoints,
-		"specEndpoints", specEndpoints, "statusEndpoints", statusEndpoints)
+		"specEndpoints", specEndpoints, "healthySpecEndpoints", healthySpecEndpoints, "statusEndpoints", statusEndpoints)
 
-	plan := externaldnsplan.NewPlan(ctx, zoneEndpoints, statusEndpoints, specEndpoints, []externaldnsplan.Policy{policy},
+	plan := externaldnsplan.NewPlan(ctx, zoneEndpoints, statusEndpoints, healthySpecEndpoints, []externaldnsplan.Policy{policy},
 		externaldnsendpoint.MatchAllDomainFilters{&zoneDomainFilter}, managedDNSRecordTypes, excludeDNSRecordTypes,
 		registry.OwnerID(), &rootDomainName,
 	)
