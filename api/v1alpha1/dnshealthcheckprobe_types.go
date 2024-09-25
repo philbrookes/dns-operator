@@ -18,7 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
-	"time"
+	"net"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,21 +28,12 @@ type DNSHealthCheckProbeSpec struct {
 	// Port to connect to the host on. Must be either 80, 443 or 1024-49151
 	// +kubebuilder:validation:XValidation:rule="self in [80, 443] || (self >= 1024 && self <= 49151)",message="Only ports 80, 443, 1024-49151 are allowed"
 	Port *int `json:"port,omitempty"`
-<<<<<<< HEAD
 	// Hostname is the value sent in the host header, to route the request to the correct service
 	// +kubebuilder:validation:Pattern=`^[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+$`
 	Hostname string `json:"hostname,omitempty"`
-	// IP Address to connect to the host on.
-	// +kubebuilder:validation:Pattern=`^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$`
-	IPAddress string `json:"ipAddress,omitempty"`
-=======
-	// Host is the value sent in the host header, to route the request to the correct service
-	// +kubebuilder:validation:Pattern=`^[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+$`
-	Host string `json:"host,omitempty"`
-	// IP Address to connect to the host on.
-	// +kubebuilder:validation:Pattern=`^[1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$`
-	IPAddress string `json:"address,omitempty"`
->>>>>>> 4270fc0 (add DNSHealthProbe CRD)
+	// Address to connect to the host on (IP Address (A Record) or hostname (CNAME)).
+	// +kubebuilder:validation:Pattern=`^([1-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]|[a-z][a-z0-9\-]+\.([a-z][a-z0-9\-]+\.)*[a-z][a-z0-9\-]+)?$`
+	Address string `json:"address,omitempty"`
 	// Path is the path to append to the host to reach the expected health check.
 	// Must start with "?" or "/", contain only valid URL characters and end with alphanumeric char or "/". For example "/" or "/healthz" are common
 	// +kubebuilder:validation:Pattern=`^(?:\?|\/)[\w\-.~:\/?#\[\]@!$&'()*+,;=]+(?:[a-zA-Z0-9]|\/){1}$`
@@ -51,7 +42,7 @@ type DNSHealthCheckProbeSpec struct {
 	// +kubebuilder:validation:XValidation:rule="self in ['HTTP','HTTPS']",message="Only HTTP or HTTPS protocols are allowed"
 	Protocol Protocol `json:"protocol,omitempty"`
 	// Interval defines how frequently this probe should execute
-	Interval time.Duration `json:"interval,omitempty"`
+	Interval metav1.Duration `json:"interval,omitempty"`
 	// AdditionalHeadersRef refers to a secret that contains extra headers to send in the probe request, this is primarily useful if an authentication
 	// token is required by the endpoint.
 	AdditionalHeadersRef *AdditionalHeadersRef `json:"additionalHeadersRef,omitempty"`
@@ -106,6 +97,17 @@ type DNSHealthCheckProbeList struct {
 	Items           []DNSHealthCheckProbe `json:"items"`
 }
 
+func (p *DNSHealthCheckProbe) GetIPAddresses() []string {
+	if net.ParseIP(p.Spec.Address) != nil {
+		return []string{
+			p.Spec.Address,
+		}
+	}
+	ips, _ := net.LookupHost(p.Spec.Address)
+	return ips
+
+}
+
 func (p *DNSHealthCheckProbe) Default() {
 	if p.Spec.Protocol == "" {
 		p.Spec.Protocol = HttpProtocol
@@ -113,11 +115,7 @@ func (p *DNSHealthCheckProbe) Default() {
 }
 
 func (p *DNSHealthCheckProbe) ToString() string {
-<<<<<<< HEAD
-	return fmt.Sprintf("%v://%v:%v/%v", p.Spec.Protocol, p.Spec.Hostname, p.Spec.Port, p.Spec.Path)
-=======
-	return fmt.Sprintf("%v://%v:%v/%v", p.Spec.Protocol, p.Spec.Host, p.Spec.Port, p.Spec.Path)
->>>>>>> 4270fc0 (add DNSHealthProbe CRD)
+	return fmt.Sprintf("%v://%v:%v%v", p.Spec.Protocol, p.Spec.Hostname, *p.Spec.Port, p.Spec.Path)
 }
 
 func init() {

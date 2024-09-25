@@ -37,19 +37,8 @@ metadata:
       ]
     capabilities: Basic Install
     categories: Integration & Delivery
-    containerImage: quay.io/kuadrant/dns-operator:latest
-<<<<<<< HEAD
-<<<<<<< HEAD
-    createdAt: "2024-10-01T10:02:18Z"
-=======
-    createdAt: "2024-09-25T08:55:26Z"
->>>>>>> 1ac6aaf (add DNSHealthProbe CRD)
-=======
-    createdAt: "2024-09-25T08:55:26Z"
-=======
-    createdAt: "2024-09-25T07:48:44Z"
->>>>>>> 4270fc0 (add DNSHealthProbe CRD)
->>>>>>> 8491587 (add DNSHealthProbe CRD)
+    containerImage: quay.io/philbrookes/dns-operator:latest
+    createdAt: "2024-10-02T08:27:23Z"
     description: A Kubernetes Operator to manage the lifecycle of DNS resources
     operators.operatorframework.io/builder: operator-sdk-v1.33.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
@@ -170,7 +159,7 @@ spec:
                 - /manager
                 env:
                 - name: WATCH_NAMESPACES
-                image: quay.io/kuadrant/dns-operator:latest
+                image: quay.io/philbrookes/dns-operator:latest
                 livenessProbe:
                   httpGet:
                     path: /healthz

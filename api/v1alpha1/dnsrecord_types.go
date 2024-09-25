@@ -44,34 +44,18 @@ type HealthCheckSpec struct {
 	Path string `json:"path,omitempty"`
 	// Protocol to use when connecting to the host, valid values are "HTTP" or "HTTPS"
 	// +kubebuilder:validation:XValidation:rule="self in ['HTTP','HTTPS']",message="Only HTTP or HTTPS protocols are allowed"
-<<<<<<< HEAD
 	Protocol Protocol `json:"protocol,omitempty"`
 	// Interval defines how frequently this probe should execute
 	Interval metav1.Duration `json:"interval,omitempty"`
 	// AdditionalHeadersRef refers to a secret that contains extra headers to send in the probe request, this is primarily useful if an authentication
 	// token is required by the endpoint.
 	AdditionalHeadersRef *AdditionalHeadersRef `json:"additionalHeadersRef,omitempty"`
-=======
-	Protocol *Protocol `json:"protocol,omitempty"`
-
->>>>>>> 1ac6aaf (add DNSHealthProbe CRD)
 	// FailureThreshold is a limit of consecutive failures that must occur for a host to be considered unhealthy
 	// +kubebuilder:validation:XValidation:rule="self > 0",message="Failure threshold must be greater than 0"
 	FailureThreshold *int `json:"failureThreshold,omitempty"`
 	// AllowInsecureCertificate will instruct the health check probe to not fail on a self-signed or otherwise invalid SSL certificate
 	// this is primarily used in development or testing environments
 	AllowInsecureCertificate bool `json:"allowInsecureCertificate,omitempty"`
-}
-
-type AdditionalHeadersRef struct {
-	Name string `json:"name"`
-}
-
-type AdditionalHeaders []AdditionalHeader
-
-type AdditionalHeader struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
 }
 
 type HealthCheckStatus struct {

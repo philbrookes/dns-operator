@@ -1,20 +1,15 @@
 apiVersion: kuadrant.io/v1alpha1
 kind: DNSHealthCheckProbe
 metadata:
-  name: dnsprobe-sample
+  name: $NAME
 spec:
   port: 443
-<<<<<<< HEAD
-  hostname: "test.com"
-  ipAddress: "192.168.0.16"
-=======
-  host: "test.com"
-  address: "192.168.0.16"
->>>>>>> 4270fc0 (add DNSHealthProbe CRD)
-  path: "/"
-  protocol: "HTTPS"
-  interval: "60s"
+  hostname: test.com
+  address: 192.168.0.16
+  path: /healthz
+  protocol: HTTPS
+  interval: 60s
   additionalHeadersRef: 
-    name: "headersSecret"
+    name: headers
   failureThreshold: 5
   allowInsecureCertificate: True
