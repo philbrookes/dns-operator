@@ -19,6 +19,10 @@ spec:
       jsonPath: .status.conditions[?(@.type=="Ready")].status
       name: Ready
       type: string
+    - description: DNSRecord all unpublish rules are false.
+      jsonPath: .spec.publish
+      name: Publish
+      type: boolean
     - description: DNSRecord healthy.
       jsonPath: .status.conditions[?(@.type=="Healthy")].status
       name: Healthy
@@ -192,6 +196,8 @@ spec:
                 required:
                 - name
                 type: object
+              publish:
+                type: boolean
               rootHost:
                 description: |-
                   rootHost is the single root for all endpoints in a DNSRecord.

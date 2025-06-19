@@ -1,7 +1,7 @@
 apiVersion: kuadrant.io/v1alpha1
 kind: DNSRecord
 metadata:
-  name: weighted-loadbalanced-healthchecks-dns
+  name: geo-loadbalanced-dns
 spec:
   endpoints:
     - dnsName: 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
@@ -22,19 +22,17 @@ spec:
     - dnsName: eu.klb.${KUADRANT_SUB_DOMAIN}
       recordTTL: 60
       recordType: CNAME
-      setIdentifier: 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
       targets:
         - 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: us.klb.${KUADRANT_SUB_DOMAIN}
       recordTTL: 60
       recordType: CNAME
-      setIdentifier: 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
       targets:
         - 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
-        - name: weight
-          value: "100"
+        - name: geo-code
+          value: ${TEST_DNS_GEO_EU}
       recordTTL: 300
       recordType: CNAME
       setIdentifier: EU
@@ -42,18 +40,22 @@ spec:
         - eu.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
-        - name: weight
-          value: "100"
+        - name: geo-code
+          value: ${TEST_DNS_GEO_US}
       recordTTL: 300
       recordType: CNAME
       setIdentifier: US
       targets:
         - us.klb.${KUADRANT_SUB_DOMAIN}
-  healthCheck:
-    path: /health
-    failureThreshold: 3
-    port: 80
-    protocol: HTTPS
+    - dnsName: klb.${KUADRANT_SUB_DOMAIN}
+      providerSpecific:
+        - name: geo-code
+          value: '*'
+      recordTTL: 300
+      recordType: CNAME
+      setIdentifier: default
+      targets:
+        - eu.klb.${KUADRANT_SUB_DOMAIN}
   rootHost: ${KUADRANT_SUB_DOMAIN}
   providerRef:
     name: ${KUADRANT_DNS_PROVIDER_REF}

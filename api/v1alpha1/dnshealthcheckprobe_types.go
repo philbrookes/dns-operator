@@ -21,7 +21,14 @@ import (
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	k8stypes "k8s.io/apimachinery/pkg/types"
 )
+
+func (p *DNSHealthCheckProbe) GetLocator() string {
+	name := strings.TrimPrefix(namespacedName(p.GetNamespace(), p.GetName()), string(k8stypes.Separator))
+	return fmt.Sprintf("%s%s%s", strings.ToLower(p.GroupVersionKind().GroupKind().String()), string(kindNameLocatorSeparator), name)
+}
 
 // DNSHealthCheckProbeSpec defines the desired state of DNSHealthCheckProbe
 type DNSHealthCheckProbeSpec struct {

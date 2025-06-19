@@ -24,7 +24,20 @@ import (
 	externaldns "sigs.k8s.io/external-dns/endpoint"
 
 	"github.com/kuadrant/dns-operator/internal/common/hash"
+
+	k8stypes "k8s.io/apimachinery/pkg/types"
 )
+
+const kindNameLocatorSeparator = ':'
+
+func namespacedName(ns, n string) string {
+	return k8stypes.NamespacedName{Namespace: ns, Name: n}.String()
+}
+
+func (p *DNSRecord) GetLocator() string {
+	name := strings.TrimPrefix(namespacedName(p.GetNamespace(), p.GetName()), string(k8stypes.Separator))
+	return fmt.Sprintf("%s%s%s", strings.ToLower(p.GroupVersionKind().GroupKind().String()), string(kindNameLocatorSeparator), name)
+}
 
 type Protocol string
 
@@ -113,6 +126,9 @@ type DNSRecordSpec struct {
 
 	// +optional
 	HealthCheck *HealthCheckSpec `json:"healthCheck,omitempty"`
+
+	// +optional
+	Publish bool `json:"publish,omitempty"`
 }
 
 // DNSRecordStatus defines the observed state of DNSRecord
@@ -159,15 +175,15 @@ type DNSRecordStatus struct {
 	ZoneDomainName string `json:"zoneDomainName,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description="DNSRecord ready."
-//+kubebuilder:printcolumn:name="Healthy",type="string",JSONPath=".status.conditions[?(@.type==\"Healthy\")].status",description="DNSRecord healthy.",priority=2
-//+kubebuilder:printcolumn:name="Root Host",type="string",JSONPath=".spec.rootHost",description="DNSRecord root host.",priority=2
-//+kubebuilder:printcolumn:name="Owner ID",type="string",JSONPath=".status.ownerID",description="DNSRecord owner id.",priority=2
-//+kubebuilder:printcolumn:name="Zone Domain",type="string",JSONPath=".status.zoneDomainName",description="DNSRecord zone domain name.",priority=2
-//+kubebuilder:printcolumn:name="Zone ID",type="string",JSONPath=".status.zoneID",description="DNSRecord zone id.",priority=2
-
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description="DNSRecord ready."
+// +kubebuilder:printcolumn:name="Publish",type="boolean",JSONPath=".spec.publish",description="DNSRecord all unpublish rules are false."
+// +kubebuilder:printcolumn:name="Healthy",type="string",JSONPath=".status.conditions[?(@.type==\"Healthy\")].status",description="DNSRecord healthy.",priority=2
+// +kubebuilder:printcolumn:name="Root Host",type="string",JSONPath=".spec.rootHost",description="DNSRecord root host.",priority=2
+// +kubebuilder:printcolumn:name="Owner ID",type="string",JSONPath=".status.ownerID",description="DNSRecord owner id.",priority=2
+// +kubebuilder:printcolumn:name="Zone Domain",type="string",JSONPath=".status.zoneDomainName",description="DNSRecord zone domain name.",priority=2
+// +kubebuilder:printcolumn:name="Zone ID",type="string",JSONPath=".status.zoneID",description="DNSRecord zone id.",priority=2
 // DNSRecord is the Schema for the dnsrecords API
 type DNSRecord struct {
 	metav1.TypeMeta   `json:",inline"`

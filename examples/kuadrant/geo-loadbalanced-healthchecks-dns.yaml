@@ -22,19 +22,17 @@ spec:
     - dnsName: eu.klb.${KUADRANT_SUB_DOMAIN}
       recordTTL: 60
       recordType: CNAME
-      setIdentifier: 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
       targets:
         - 14byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: us.klb.${KUADRANT_SUB_DOMAIN}
       recordTTL: 60
       recordType: CNAME
-      setIdentifier: 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
       targets:
         - 24byhk-2k52h1.klb.${KUADRANT_SUB_DOMAIN}
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
         - name: geo-code
-          value: GEO-EU
+          value: ${TEST_DNS_GEO_EU}
       recordTTL: 300
       recordType: CNAME
       setIdentifier: EU
@@ -43,7 +41,7 @@ spec:
     - dnsName: klb.${KUADRANT_SUB_DOMAIN}
       providerSpecific:
         - name: geo-code
-          value: GEO-NA
+          value: ${TEST_DNS_GEO_US}
       recordTTL: 300
       recordType: CNAME
       setIdentifier: US
