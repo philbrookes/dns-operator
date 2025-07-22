@@ -62,7 +62,11 @@ const (
 
 	SecretTypeKuadrantCoreDNS corev1.SecretType = "kuadrant.io/coredns"
 
-	DefaultProviderSecretLabel = "kuadrant.io/default-provider"
+	DefaultProviderSecretLabel                   = "kuadrant.io/default-provider"
+	EndpointGVRKey                               = "kuadrant.io/endpoint_gvr"
+	EndpointLabelSelectorKey                     = "kuadrant.io/zone_record_label"
+	EndpointLabelValueKey                        = "kuadrant.io/zone_record_label_value"
+	SecretTypeKuadrantEndpoint corev1.SecretType = "kuadrant.io/endpoint"
 )
 
 type ProviderRef struct {

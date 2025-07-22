@@ -210,7 +210,8 @@ const WildcardPrefix = "*."
 func (s *DNSRecord) Validate() error {
 	root := s.Spec.RootHost
 	if len(s.Spec.Endpoints) == 0 {
-		return fmt.Errorf("no endpoints defined for DNSRecord. Nothing to do")
+		// probably a zone record with nothing merged into it yet, just ignore it until it has records
+		return nil
 	}
 
 	root, _ = strings.CutPrefix(root, WildcardPrefix)

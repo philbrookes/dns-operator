@@ -31,6 +31,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -97,7 +98,13 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	providerFactory, err := provider.NewFactory(mgr.GetClient(), []string{provider.DNSProviderInMem.String()})
+	config, err := rest.InClusterConfig()
+	Expect(err).ToNot(HaveOccurred())
+
+	dynClient, err := dynamic.NewForConfig(config)
+	Expect(err).ToNot(HaveOccurred())
+
+	providerFactory, err := provider.NewFactory(mgr.GetClient(), dynClient, []string{provider.DNSProviderInMem.String()})
 	Expect(err).ToNot(HaveOccurred())
 
 	err = (&DNSRecordReconciler{
