@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/kuadrant/dns-operator/api/v1alpha1"
+	"github.com/kuadrant/dns-operator/internal/controller"
 	"github.com/kuadrant/dns-operator/internal/provider"
 	_ "github.com/kuadrant/dns-operator/internal/provider/aws"
 	_ "github.com/kuadrant/dns-operator/internal/provider/azure"
@@ -42,6 +43,7 @@ const (
 	dnsClusterContextsEnvvar    = "TEST_DNS_CLUSTER_CONTEXTS"
 	deploymentCountEnvvar       = "DEPLOYMENT_COUNT"
 	clusterCountEnvvar          = "CLUSTER_COUNT"
+	ControllerRunMode           = "TEST_DELEGATION_MODE"
 )
 
 var (
@@ -49,6 +51,7 @@ var (
 	testSuiteID string
 	// testZoneDomainName provided domain name for the testZoneID e.g. e2e.hcpapps.net
 	testZoneDomainName     string
+	testControllerRunMode  string
 	testProviderSecretName string
 	testConcurrentRecords  int
 	testNamespaces         []string
@@ -77,6 +80,7 @@ var (
 type testCluster struct {
 	name                   string
 	testDNSProviderSecrets []*v1.Secret
+	testNamespaces         []string
 	k8sClient              client.Client
 	dynamicClient          dynamic.Interface
 }
@@ -119,13 +123,20 @@ var _ = BeforeSuite(func(ctx SpecContext) {
 	Expect(err).NotTo(HaveOccurred())
 
 	loadClusters(ctx)
-	Expect(testDNSProvider).NotTo(BeEmpty())
-	Expect(testZoneDomainName).NotTo(BeEmpty())
-	Expect(testClusters).NotTo(BeEmpty())
-	for i := range testClusters {
-		Expect(testClusters[i].testDNSProviderSecrets).NotTo(BeEmpty())
+	if testControllerRunMode != controller.DelegationRoleSecondary {
+		Expect(testDNSProvider).NotTo(BeEmpty())
 	}
 
+	Expect(testZoneDomainName).NotTo(BeEmpty())
+	Expect(testClusters).NotTo(BeEmpty())
+	if testControllerRunMode != controller.DelegationRoleSecondary {
+		for i := range testClusters {
+			Expect(testClusters[i].testDNSProviderSecrets).NotTo(BeEmpty())
+		}
+	}
+	for i := range testClusters {
+		Expect(testClusters[i].testNamespaces).NotTo(BeEmpty())
+	}
 	recordsReadyMaxDuration = GetRecordsReadyTimeout(testDNSProvider)
 	recordsRemovedMaxDuration = GetRecordsDeletedTimeout(testDNSProvider)
 
@@ -176,8 +187,12 @@ func setConfigFromEnvVars() error {
 	if testZoneDomainName = os.Getenv(dnsZoneDomainNameEnvvar); testZoneDomainName == "" {
 		return fmt.Errorf("env variable '%s' must be set", dnsZoneDomainNameEnvvar)
 	}
-	if testProviderSecretName = os.Getenv(dnsProviderSecretNameEnvvar); testProviderSecretName == "" {
-		return fmt.Errorf("env variable '%s' must be set", dnsProviderSecretNameEnvvar)
+
+	// Don't test for a provider secret in secondary mode
+	if testControllerRunMode = os.Getenv(ControllerRunMode); testControllerRunMode != controller.DelegationRoleSecondary {
+		if testProviderSecretName = os.Getenv(dnsProviderSecretNameEnvvar); testProviderSecretName == "" {
+			return fmt.Errorf("env variable '%s' must be set", dnsProviderSecretNameEnvvar)
+		}
 	}
 
 	namespacesStr := os.Getenv(dnsNamespacesEnvvar)
@@ -270,7 +285,11 @@ func loadClusters(ctx context.Context) {
 			dynamicClient: dynamicClient,
 		}
 
-		loadProviderSecrets(ctx, tc)
+		tc.testNamespaces = testNamespaces
+
+		if testControllerRunMode != controller.DelegationRoleSecondary {
+			loadProviderSecrets(ctx, tc)
+		}
 
 		//Append the cluster to the list of test clusters
 		testClusters = append(testClusters, *tc)
