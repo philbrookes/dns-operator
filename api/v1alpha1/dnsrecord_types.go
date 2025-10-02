@@ -125,6 +125,14 @@ type DNSRecordSpec struct {
 
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="delegate is immutable"
 	Delegate bool `json:"delegate,omitempty"`
+
+	Group DNSGroupSpec `json: "group,omitempty"`
+}
+
+type DNSGroupSpec struct {
+	ID string `json:"id"`
+	// +kubebuilder:validation:Enum=active;passive
+	State string `json:"state"`
 }
 
 // DNSRecordStatus defines the observed state of DNSRecord
