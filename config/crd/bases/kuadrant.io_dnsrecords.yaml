@@ -122,6 +122,21 @@ spec:
                   type: object
                 minItems: 0
                 type: array
+              group:
+                properties:
+                  id:
+                    maxLength: 36
+                    minLength: 1
+                    type: string
+                  state:
+                    enum:
+                    - active
+                    - passive
+                    type: string
+                required:
+                - id
+                - state
+                type: object
               healthCheck:
                 description: |-
                   HealthCheckSpec configures health checks in the DNS provider.

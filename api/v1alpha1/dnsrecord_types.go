@@ -35,6 +35,8 @@ const HttpProtocol Protocol = "HTTP"
 const HttpsProtocol Protocol = "HTTPS"
 const AuthoritativeRecordLabel = "kuadrant.io/authoritative-record"
 const AuthoritativeRecordHashLabel = "kuadrant.io/authoritative-record-hash"
+const ActiveGroupState = "active"
+const PassiveGroupState = "passive"
 
 // HealthCheckSpec configures health checks in the DNS provider.
 // By default this health check will be applied to each unique DNS A Record for
@@ -126,13 +128,19 @@ type DNSRecordSpec struct {
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="delegate is immutable"
 	Delegate bool `json:"delegate,omitempty"`
 
-	Group DNSGroupSpec `json: "group,omitempty"`
+	Group *DNSGroupSpec `json:"group,omitempty"`
 }
 
 type DNSGroupSpec struct {
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=36
 	ID string `json:"id"`
 	// +kubebuilder:validation:Enum=active;passive
 	State string `json:"state"`
+}
+
+func (g *DNSGroupSpec) IsActive() bool {
+	return g.State == ActiveGroupState
 }
 
 // DNSRecordStatus defines the observed state of DNSRecord
