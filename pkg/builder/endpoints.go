@@ -84,13 +84,7 @@ func NewEndpointsBuilder(target Target, hostname string) *EndpointsBuilder {
 	return &EndpointsBuilder{
 		target:   target,
 		hostname: hostname,
-		group:    "",
 	}
-}
-
-func (builder *EndpointsBuilder) WithGroup(group string) *EndpointsBuilder {
-	builder.group = group
-	return builder
 }
 
 // WithLoadBalancing provides builder with necessary parameters to generate a load-balancing set of endpoints.
@@ -178,12 +172,12 @@ func (builder *EndpointsBuilder) getSimpleEndpoints() []*externaldns.Endpoint {
 	ipValues, hostValues := targetsFromAddresses(builder.target.GetAddresses())
 
 	if len(ipValues) > 0 {
-		endpoint := createEndpoint(builder.hostname, ipValues, v1alpha1.ARecordType, "", DefaultTTL, builder.group)
+		endpoint := createEndpoint(builder.hostname, ipValues, v1alpha1.ARecordType, "", DefaultTTL)
 		endpoints = append(endpoints, endpoint)
 	}
 
 	if len(hostValues) > 0 {
-		endpoint := createEndpoint(builder.hostname, hostValues, v1alpha1.CNAMERecordType, "", DefaultTTL, builder.group)
+		endpoint := createEndpoint(builder.hostname, hostValues, v1alpha1.CNAMERecordType, "", DefaultTTL)
 		endpoints = append(endpoints, endpoint)
 	}
 
@@ -226,13 +220,13 @@ func (builder *EndpointsBuilder) getLoadBalancedEndpoints() []*externaldns.Endpo
 
 	if len(ipValues) > 0 {
 		aRecordLbName := strings.ToLower(fmt.Sprintf("%s-%s.%s", getShortCode(builder.loadBalancing.Id), getShortCode(fmt.Sprintf("%s-%s", builder.target.GetName(), builder.target.GetNamespace())), lbName))
-		endpoint = createEndpoint(aRecordLbName, ipValues, v1alpha1.ARecordType, "", DefaultTTL, builder.group)
+		endpoint = createEndpoint(aRecordLbName, ipValues, v1alpha1.ARecordType, "", DefaultTTL)
 		endpoints = append(endpoints, endpoint)
 		hostValues = append(hostValues, aRecordLbName)
 	}
 
 	for _, hostValue := range hostValues {
-		endpoint = createEndpoint(geoLbName, []string{hostValue}, v1alpha1.CNAMERecordType, hostValue, DefaultTTL, builder.group)
+		endpoint = createEndpoint(geoLbName, []string{hostValue}, v1alpha1.CNAMERecordType, hostValue, DefaultTTL)
 		endpoint.SetProviderSpecificProperty(v1alpha1.ProviderSpecificWeight, strconv.Itoa(int(builder.loadBalancing.Weight)))
 		endpoints = append(endpoints, endpoint)
 	}
@@ -243,20 +237,20 @@ func (builder *EndpointsBuilder) getLoadBalancedEndpoints() []*externaldns.Endpo
 	}
 
 	//Create lbName CNAME (lb-a1b2.shop.example.com -> <geoCode>.lb-a1b2.shop.example.com)
-	endpoint = createEndpoint(lbName, []string{geoLbName}, v1alpha1.CNAMERecordType, geoCode, DefaultCnameTTL, builder.group)
+	endpoint = createEndpoint(lbName, []string{geoLbName}, v1alpha1.CNAMERecordType, geoCode, DefaultCnameTTL)
 	endpoint.SetProviderSpecificProperty(v1alpha1.ProviderSpecificGeoCode, geoCode)
 	endpoints = append(endpoints, endpoint)
 
 	//Add a default geo (*) endpoint if the current geoCode is a default geo
 	if builder.loadBalancing.IsDefaultGeo {
-		endpoint = createEndpoint(lbName, []string{geoLbName}, v1alpha1.CNAMERecordType, "default", DefaultCnameTTL, builder.group)
+		endpoint = createEndpoint(lbName, []string{geoLbName}, v1alpha1.CNAMERecordType, "default", DefaultCnameTTL)
 		endpoint.SetProviderSpecificProperty(v1alpha1.ProviderSpecificGeoCode, WildcardGeo)
 		endpoints = append(endpoints, endpoint)
 	}
 
 	if len(endpoints) > 0 {
 		//Create gwListenerHost CNAME (shop.example.com -> lb-a1b2.shop.example.com)
-		endpoint = createEndpoint(builder.hostname, []string{lbName}, v1alpha1.CNAMERecordType, "", DefaultCnameTTL, builder.group)
+		endpoint = createEndpoint(builder.hostname, []string{lbName}, v1alpha1.CNAMERecordType, "", DefaultCnameTTL)
 		endpoints = append(endpoints, endpoint)
 	}
 
@@ -264,7 +258,7 @@ func (builder *EndpointsBuilder) getLoadBalancedEndpoints() []*externaldns.Endpo
 }
 
 func createEndpoint(dnsName string, targets externaldns.Targets, recordType v1alpha1.DNSRecordType, setIdentifier string,
-	recordTTL externaldns.TTL, group string) (endpoint *externaldns.Endpoint) {
+	recordTTL externaldns.TTL) (endpoint *externaldns.Endpoint) {
 	return &externaldns.Endpoint{
 		DNSName:       dnsName,
 		Targets:       targets,
