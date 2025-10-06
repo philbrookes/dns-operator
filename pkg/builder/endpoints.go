@@ -88,7 +88,7 @@ func NewEndpointsBuilder(target Target, hostname string) *EndpointsBuilder {
 	}
 }
 
-func (builder *EndpointsBuilder) withGroup(group string) *EndpointsBuilder {
+func (builder *EndpointsBuilder) WithGroup(group string) *EndpointsBuilder {
 	builder.group = group
 	return builder
 }
