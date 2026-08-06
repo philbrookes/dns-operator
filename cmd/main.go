@@ -281,12 +281,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if minRequeueTime < 5*time.Second {
-		setupLog.Error(fmt.Errorf("min-requeue-time (%s) must be at least 5s to avoid provider throttling", minRequeueTime), "invalid configuration")
-		os.Exit(1)
-	}
-	if maxRequeueTime > 15*time.Minute {
-		setupLog.Error(fmt.Errorf("max-requeue-time (%s) must not exceed 15m", maxRequeueTime), "invalid configuration")
+	if minRequeueTime > maxRequeueTime {
+		setupLog.Error(fmt.Errorf("min-requeue-time (%s) must not exceed max-requeue-time (%s)", minRequeueTime, maxRequeueTime), "invalid configuration")
 		os.Exit(1)
 	}
 
